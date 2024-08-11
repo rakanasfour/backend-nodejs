@@ -8,7 +8,7 @@ import { Users } from './users.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'inventory-db-aws.cl6qtov8jgu8.us-east-2.rds.amazonaws.com',
+      host: 'root:Password@mysql-service:3306',
       port: 3306,
       username: 'root',
       password: 'Password',
