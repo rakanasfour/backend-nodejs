@@ -1,0 +1,51 @@
+name: Build, Test, and Push Node.js Docker Image to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build the Node.js app
+      run: npm run build
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.docker_username_public_ecr_aws }}
+        aws-secret-access-key: ${{ secrets.docker_password_public_ecr_aws }}
+        aws-region: us-east-2 # Ensure this matches your region
+
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build Docker image
+      run: |
+        docker build -t backend .
+
+    - name: Tag Docker image
+      run: |
+        docker tag backend:latest 866934333672.dkr.ecr.us-east-2.amazonaws.com/backend:latest
+
+    - name: Push Docker image to ECR
+      run: |
+        docker push 866934333672.dkr.ecr.us-east-2.amazonaws.com/backend:latest
